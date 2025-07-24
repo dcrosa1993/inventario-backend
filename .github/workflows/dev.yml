@@ -63,6 +63,8 @@ jobs:
             DB_PASS=${{secrets.DB_PASSWORD}}
             JWT_SECRET=${{secrets.JWT_SECRET}}
             JWT_EXPIRES_IN=3600s
+            ADMIN_EMAIL=${{secrets.ADMIN_EMAIL}}
+            ADMIN_PASSWORD=${{secrets.ADMIN_PASSWORD}}
 
       - name: Deploy en el servidor remoto
         run: |
