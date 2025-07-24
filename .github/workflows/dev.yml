@@ -73,7 +73,7 @@ jobs:
             "docker_image": "denismaycr/personal_projects:inventory-backend-dev",
             "host_port": 8110,
             "container_port": 3000
-          }' http://104.37.187.205:8100/deploy
+          }' ${{secrets.DEPLOY_URL}}
 
       - name: Enviar mensaje de éxito a Telegram
         if: success()
