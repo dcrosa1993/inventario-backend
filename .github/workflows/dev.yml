@@ -1,0 +1,95 @@
+name: Inventory Dev
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Obtener información del commit
+        id: git_info
+        run: |
+          echo "GIT_MESSAGE=$(git log -n 1 --format=%s)" >> $GITHUB_ENV
+          echo "GIT_AUTHOR=$(git log -n 1 --format=%ae)" >> $GITHUB_ENV
+          echo "GIT_COMMIT_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "GIT_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "JOB_NAME=Inventory dev" >> $GITHUB_ENV
+          echo "TEXT_BREAK=----------------------------------------------------" >> $GITHUB_ENV
+
+      - name: Enviar mensaje de inicio a Telegram
+        run: |
+          curl --location --request POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+          --form "text=${{ env.TEXT_BREAK }}
+          Branch: ${{ env.GIT_BRANCH }}
+          Commit: ${{ env.GIT_COMMIT_SHORT }}
+          Message: ${{ env.GIT_MESSAGE }}
+          Author: ${{ env.GIT_AUTHOR }}
+          ${{ env.JOB_NAME }} is Building" \
+          --form "chat_id=${{ secrets.CHAT_ID }}"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Set up Docker Buildx``
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+
+      - name: Build and push image with Github
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: denismaycr/personal_projects:inventory-backend-dev
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            DB_HOST=104.37.187.205
+            DB_PORT=5432
+            DB_NAME=inventory
+            DB_USER=${{secrets.DB_USERNAME}}
+            DB_PASS=${{secrets.DB_PASSWORD}}
+            JWT_SECRET=${{secrets.JWT_SECRET}}
+            JWT_EXPIRES_IN=3600s
+
+      - name: Deploy en el servidor remoto
+        run: |
+          curl -X POST -H "Content-Type: application/json" -H "x-deploy-token: ${{ secrets.DEPLOY_TOKEN }}" -d '{
+            "container_name": "inventory-backend-dev",
+            "docker_image": "denismaycr/personal_projects:inventory-backend-dev",
+            "host_port": 8110,
+            "container_port": 3000
+          }' http://104.37.187.205:8100/deploy
+
+      - name: Enviar mensaje de éxito a Telegram
+        if: success()
+        run: |
+          curl --location --request POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+            --form "text=${{ env.JOB_NAME }} is Success
+          TEXT_SITE_URL=URL:
+          Frontend: https://followappmanage.prodevsolution.dev
+          Backend: https://followapp-api.prodevsolution.dev" \
+            --form "chat_id=${{ secrets.CHAT_ID }}"
+
+      - name: Enviar mensaje de fallo a Telegram con logs
+        if: failure()
+        run: |
+          curl --location --request POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+            --form "text=${{ env.JOB_NAME }} is Failure
+          Branch: ${{ env.GIT_BRANCH }}
+          Commit: ${{ env.GIT_COMMIT_SHORT }}
+          Error Logs:
+          $(echo ${{ env.ERROR_LOGS }} | base64 -d | tail -n 15)" \
+            --form "chat_id=${{ secrets.CHAT_ID }}"

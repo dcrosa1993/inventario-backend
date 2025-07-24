@@ -1,0 +1,34 @@
+FROM node:20 as builder
+
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_NAME
+ARG DB_USER
+ARG DB_PASS
+ARG JWT_SECRET
+ARG JWT_EXPIRES_IN
+
+ENV DB_HOST=$DB_HOST
+ENV DB_PORT=$DB_PORT
+ENV DB_NAME=$DB_NAME
+ENV DB_USER=$DB_USER
+ENV DB_PASS=$DB_PASS
+ENV JWT_SECRET=$JWT_SECRET
+ENV JWT_EXPIRES_IN=$JWT_EXPIRES_IN
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm ci
+
+RUN echo '#!/bin/bash' > start.sh
+RUN echo 'npm install' >> start.sh
+RUN echo 'npm run start' >> start.sh
+RUN chmod +x start.sh
+
+COPY . .
+
+EXPOSE 3000
+
+ENTRYPOINT ["/usr/src/app/start.sh"]
