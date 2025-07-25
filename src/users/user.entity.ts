@@ -1,4 +1,5 @@
-import { Entidad } from 'src/entity/entidad.entity';
+import { Entidad } from 'src/entidad/entidad.entity';
+import { Product } from 'src/product/product.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 export enum UserRole {
@@ -25,4 +26,7 @@ export class User {
 
   @OneToMany(() => Entidad, entidad => entidad.user, { cascade: true })
   entidades: Entidad[];
+
+  @OneToMany(() => Product, producto => producto.user, { cascade: true })
+  products: Product[];
 }

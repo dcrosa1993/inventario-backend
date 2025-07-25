@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
 import { UsersService } from './users/users.service';
 import { UserRole } from './users/user.entity';
-import { EntidadService } from './entity/entidad.service';
+import { EntidadService } from './entidad/entidad.service';
 
 async function seedAdminAndStore(app: INestApplication) {
   const usersService = app.get(UsersService);

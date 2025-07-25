@@ -5,7 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { EntidadModule } from './entity/entidad.module';
+import { EntidadModule } from './entidad/entidad.module';
+import { ProductModule } from './product/product.module';
 
 
 @Module({
@@ -28,6 +29,7 @@ import { EntidadModule } from './entity/entidad.module';
     UsersModule,
     AuthModule,
     EntidadModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],
