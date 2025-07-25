@@ -1,0 +1,19 @@
+esta es la lista de requerimientos
+mod de usuarios
+modulo de kioskos
+nombre direccion
+cada kiosko tiene un inventario
+el inventario tiene productos
+cantidad
+nombre
+precio de compra
+precio de venta
+observacion
+tabla entrada y salida
+producto
+cantidad
+fecha y hora
+usuario
+
+cada usuaruo tiene un almacen con las mismas caracteristicas que un kiosko
+dashboard para administrar las cuentas.
