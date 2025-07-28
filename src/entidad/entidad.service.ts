@@ -6,11 +6,23 @@ import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class EntidadService {
+
   constructor(
     @InjectRepository(Entidad)
     private repo: Repository<Entidad>,
     private usersService: UsersService,
   ) {}
+
+  async findOne(id: string): Promise<Entidad> {
+    const entidad = await this.repo.findOne({
+      where: { id },
+      relations: ['user'],  
+    });
+    if (!entidad) {
+      throw new NotFoundException(`Entidad con id ${id} no encontrada`);
+    }
+    return entidad;
+  }
 
   async create(userId: string, data: { name: string; address?: string; phone?: string }) {
     const user = await this.usersService.findOne(userId);
