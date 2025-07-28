@@ -7,7 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { EntidadModule } from './entidad/entidad.module';
 import { ProductModule } from './product/product.module';
-import { MovementsModule } from './movements/movements.module';
+import { MovementModule } from './movements/movements.module';
 
 
 @Module({
@@ -31,7 +31,7 @@ import { MovementsModule } from './movements/movements.module';
     AuthModule,
     EntidadModule,
     ProductModule,
-    MovementsModule,
+    MovementModule,
   ],
   controllers: [AppController],
   providers: [AppService],
