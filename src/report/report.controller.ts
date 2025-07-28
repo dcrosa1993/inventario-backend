@@ -1,9 +1,14 @@
 // src/report/report.controller.ts
-import { Controller, Post, Body, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
-import { ClosingReportDto } from './dto/closing-report.dto';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { ClosingReportResponseDto } from './dto/closing-report-response.dto';
 
 @ApiTags('reports')
@@ -13,18 +18,41 @@ import { ClosingReportResponseDto } from './dto/closing-report-response.dto';
 export class ReportController {
   constructor(private reportService: ReportService) {}
 
-  @ApiOperation({ summary: 'Reporte de cierre por entidad y rango' })
-  @ApiBody({ type: ClosingReportResponseDto })
+  @ApiOperation({ summary: 'Reporte de cierre por entidad y rango (GET)' })
+  @ApiQuery({
+    name: 'entidadId',
+    required: false,
+    description:
+      'UUID de la entidad. Si no se pasa, usa “Almacén” por defecto.',
+  })
+  @ApiQuery({
+    name: 'start',
+    required: false,
+    description: 'Fecha/hora inicio ISO. Por defecto: ahora - 24 h.',
+  })
+  @ApiQuery({
+    name: 'end',
+    required: false,
+    description: 'Fecha/hora fin ISO. Por defecto: ahora.',
+  })
   @ApiResponse({ status: 200, type: ClosingReportResponseDto })
-  @Post('closing')
-  closing(@Request() req, @Body() dto: ClosingReportDto): Promise<ClosingReportResponseDto> {
-    // Rango por defecto últimas 24h
-    if (!dto.start || !dto.end) {
-      const now = new Date();
-      dto.end = now.toISOString();
-      dto.start = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-    }
+  @Get('closing')
+  async closing(
+    @Request() req,
+    @Query('entidadId') entidadId?: string,
+    @Query('start') start?: string,
+    @Query('end') end?: string,
+  ): Promise<ClosingReportResponseDto> {
+    // Parámetros por defecto
+    const now = new Date();
+    const dto = {
+      entidadId: entidadId ?? undefined,
+      start:
+        start ?? new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      end: end ?? now.toISOString(),
+    };
+
+    // Si no pasan entidadId, buscamos “Almacén” automáticamente
     return this.reportService.closingReport(req.user.id, dto);
   }
 }
-

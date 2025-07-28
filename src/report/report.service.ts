@@ -24,7 +24,7 @@ export class ReportService {
    */
   async closingReport(userId: string, dto: ClosingReportDto): Promise<ClosingReportResponseDto> {
   // 1) Validar entidad
-  const entidad = await this.entidadService.findOne(dto.entidadId);
+  const entidad = await this.entidadService.findOne(dto.entidadId!);
   if (entidad.user.id !== userId) {
     throw new NotFoundException(`Entidad no encontrada para el usuario`);
   }
