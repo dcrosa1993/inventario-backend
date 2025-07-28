@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { EntidadModule } from './entidad/entidad.module';
 import { ProductModule } from './product/product.module';
 import { MovementModule } from './movements/movements.module';
+import { ReportModule } from './report/report.module';
 
 
 @Module({
@@ -32,6 +33,7 @@ import { MovementModule } from './movements/movements.module';
     EntidadModule,
     ProductModule,
     MovementModule,
+    ReportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
