@@ -19,19 +19,27 @@ async function seedAdminAndStore(app: INestApplication) {
   }
 
   const almacenes = await entidadService.findAllByUser(admin.id);
-  if (!almacenes.some(e => e.name === 'Almacen')) {
+  if (!almacenes.some((e) => e.name === 'Almacen')) {
     await entidadService.create(admin.id, { name: 'Almacen' });
     console.log('Entidad "Almacen" creada para admin');
   }
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: '*',
+      credentials: true,
+    },
+  });
   const config = new DocumentBuilder()
     .setTitle('API NestJS')
     .setDescription('Documentación de la API con JWT y Usuarios')
     .setVersion('1.0')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'jwt')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'jwt',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
