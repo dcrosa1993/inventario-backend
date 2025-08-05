@@ -43,7 +43,6 @@ export class ReportController {
     @Query('start') start?: string,
     @Query('end') end?: string,
   ): Promise<ClosingReportResponseDto> {
-    // Parámetros por defecto
     const now = new Date();
     const dto = {
       entidadId: entidadId ?? undefined,
@@ -52,7 +51,6 @@ export class ReportController {
       end: end ?? now.toISOString(),
     };
 
-    // Si no pasan entidadId, buscamos “Almacén” automáticamente
     return this.reportService.closingReport(req.user.id, dto);
   }
 }
